@@ -2,9 +2,8 @@ name: Rust
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - "v*"
 
 jobs:
   
@@ -32,3 +31,9 @@ jobs:
           append_body: true
           files: target/release/q_bot.exe
           token: ${{ secrets.T }}
+          tag_name: ${{ github.ref }}
+          name: Q_Bot ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+        GITHUB_TOKEN: ${{ secrets.T}}
