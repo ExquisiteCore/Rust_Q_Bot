@@ -31,4 +31,4 @@ jobs:
         with:
           files: target/release/q_bot.exe
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.T }}
