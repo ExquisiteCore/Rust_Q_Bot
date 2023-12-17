@@ -2,7 +2,8 @@ name: Rust
 
 on:
   push:
-
+    tags:
+      - "v*"
 
 jobs:
   
@@ -34,5 +35,3 @@ jobs:
           name: Q_Bot ${{ github.ref_name }}
           draft: false
           prerelease: false
-        env:
-        GITHUB_TOKEN: ${{ secrets.T}}
