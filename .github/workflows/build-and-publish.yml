@@ -29,6 +29,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          append_body: true
           files: target/release/q_bot.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.T }}
+          token: ${{ secrets.T }}
