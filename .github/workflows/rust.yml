@@ -1,4 +1,4 @@
-name: Build and Publish
+name: Rust Build and Release
 
 on:
   push:
@@ -10,52 +10,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout Repository
       uses: actions/checkout@v2
 
     - name: Set up Rust
       uses: actions/setup-rust@v1
       with:
-        toolchain: stable
+        rust-version: 1.57.0
 
     - name: Build for Linux
       run: cargo build --release
 
-  build_windows:
-    runs-on: windows-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Rust
-      uses: actions/setup-rust@v1
-      with:
-        toolchain: stable
-
     - name: Build for Windows
-      run: cargo build --release
+      run: cargo build --release --target x86_64-pc-windows-msvc
 
-  publish:
-    runs-on: ubuntu-latest
-    needs: [build, build_windows]
-
+  release:
+    runs-on: windows-latest
+    needs: build
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Publish Linux executable
-      run: |
-        mkdir -p release
-        cp target/release/q_bot release/q_bot_linux
-
-    - name: Publish Windows executable
-      run: |
-        mkdir release
-        copy target\release\q_bot.exe release\q_bot_windows
-
-    - name: Publish artifacts
+    - name: Upload Linux Release
       uses: actions/upload-artifact@v2
       with:
-        name: release
-        path: release
+        name: q-bot-linux
+        path: target/release/q_bot
+
+    - name: Upload Windows Release
+      uses: actions/upload-artifact@v2
+      with:
+        name: q-bot-windows
+        path: target/release/q_bot.exe
