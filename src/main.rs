@@ -1,6 +1,8 @@
 mod bot;
 mod event;
+mod postrequest;
 
+use postrequest::Request;
 use bot::Bot;
 use tokio::signal::ctrl_c;
 use tokio_tungstenite::tungstenite::Message;
@@ -9,16 +11,12 @@ use event::process_json;
 async fn main() {
     
     let server_url = "192.168.1.8";
-    let mut bot = Bot::new(server_url, 5800, 5700).await;
+    let request = Request::new(server_url, 5700).await;
+    let mut bot = Bot::new(server_url, 5800,).await;
+    
 
 
-     let json_data = r#"
-        {
-            "user_id": 2977926714,
-            "message": "Bot启动"
-        }
-    "#;
-    match bot.send_post_request("send_private_msg", json_data).await{
+    match request.send_private_msg_api().await{
         Ok(text) => {
             println!("post 返回{}", text);
         }

@@ -6,14 +6,23 @@ use tokio_tungstenite::tungstenite::protocol::Message;
 use futures_util::StreamExt;
 use url::Url;
 
-
-
 pub async fn connect(url: &str) -> WebSocketStream<TcpStream> {
+    // 解析 WebSocket URL
     let server_url = Url::parse(url).expect("Failed to parse WebSocket URL");
-    let tcp_stream = TcpStream::connect(server_url.host_str().unwrap().to_string() + ":5800")
+
+    // 获取主机地址和端口
+    let host = server_url.host_str().expect("No host found in the given URL");
+    let port = server_url.port_or_known_default().expect("No port found in the given URL");
+
+    // 构建主机地址字符串，包含端口
+    let host_with_port = format!("{}:{}", host, port);
+
+    // 使用 TcpStream::connect 时直接传入解析得到的地址
+    let tcp_stream = TcpStream::connect(host_with_port)
         .await
         .expect("Failed to connect to server");
 
+    // 使用解析得到的地址和 TcpStream 建立 WebSocket 连接
     tokio_tungstenite::client_async(server_url, tcp_stream)
         .await
         .expect("Failed to establish WebSocket connection")
@@ -21,25 +30,19 @@ pub async fn connect(url: &str) -> WebSocketStream<TcpStream> {
 }
 pub struct Bot {
     ws_server_url: String,
-    http_server_url: String,
-    client: reqwest::Client,
-    pub ws_stream: WebSocketStream<TcpStream>,
+    ws_stream: WebSocketStream<TcpStream>,
     reconnecting: bool,
 }
 impl Bot {
-    pub async fn new(server_url: &str,wsport:i32,httpport:i32) -> Bot {
+    pub async fn new(server_url: &str,wsport:i32) -> Self {
 
         let ws_server_url = format!("ws://{}:{}", server_url, wsport);
-
-        let http_server_url = format!("http://{}:{}/", server_url, httpport);
 
         let ws_stream = connect(&ws_server_url)
             .await;
         Bot {
             ws_server_url,
-            http_server_url,
-            ws_stream ,
-            client: reqwest::Client::new(),
+            ws_stream,
             reconnecting : false,
         }
     }
@@ -68,39 +71,6 @@ impl Bot {
             }
             }
         }
-
-    //post请求
-    pub async fn send_post_request(&self, api: &str,json_data: &str) ->Result<String, reqwest::Error> {
-    // 发送 HTTP POST 请求
-    match self.client.post(format!("{}{}", self.http_server_url, api))
-        .header("Content-Type", "application/json")
-        .body(json_data.to_owned())
-        .send()
-        .await
-    {
-        Ok(response) => {
-            if response.status().is_success() {
-                // 成功获取响应
-                match response.text().await {
-                    Ok(text) => {
-                        Ok(text)
-                    }
-                    Err(err) => {
-                        eprintln!("Error reading response text: {:?}", err);
-                        Err(err)
-                    }
-                }
-            } else {
-                eprintln!("HTTP request failed with status code: {}", response.status());
-                Err(response.error_for_status().unwrap_err())
-            }
-        }
-        Err(err) => {
-            eprintln!("Error sending HTTP request: {:?}", err);
-            Err(err)
-        }
-    }
-    }
     
     // 关闭 WebSocket 连接
     pub async fn close_websocket(&mut self) {

@@ -1,0 +1,9 @@
+{
+    "nickname": "昵称",
+    "company": "公司",
+    "email": "邮箱",
+    "college": "大学",
+    "personal_note": "个人备注",
+    "age": 18,
+    "birthday": "生日"
+}
