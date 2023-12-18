@@ -1,5 +1,4 @@
 use serde_json::{Map, Value, json};
-use std::collections::HashMap;
 pub struct Request {
     http_server_url: String,
     client: reqwest::Client,
@@ -47,26 +46,40 @@ impl Request {
 }
 
 impl Request {//高级封装
-    pub async fn send_private_msg_api(&self) -> Result<String, reqwest::Error> {
+    pub async fn send_private_msg_api(&self,user_id:&u32,message:&str) -> Result<String, reqwest::Error> {
         // 构建 API 路径
         let api_path = "send_private_msg";
+        let json_data = synthesis_json(&[
+        json!("user_id"),
+        json!(user_id),
+        json!("message"),
+        json!(message),
+        ]);
+        self.send_post_request(api_path, json_data.to_string().as_str()).await
+    }
+    // pub async fn send_group_msg_api(&self) -> Result<String, reqwest::Error> {
+    //     // 构建 API 路径
+    //     let api_path = "send_group_msg";
+    //     let json_data = r#"
+    //     {
+    //         "user_id": 2977926714,
+    //         "message": "Bot启动"
+    //     }"#;
+    //     self.send_post_request(api_path, json_data).await
+    // }
+}
 
-        let json_data = r#"
-        {
-            "user_id": 2977926714,
-            "message": "Bot启动"
-        }"#;
-        // 调用 Bot 实例的 send_post_request 方法
-        self.send_post_request(api_path, json_data).await
+
+fn synthesis_json(args: &[Value]) -> Value {
+    let mut json_map = Map::new();
+    let mut iter = args.iter().peekable();
+
+    while let Some(key) = iter.next() {
+        if let Some(value) = iter.next() {
+            if let Some(key_str) = key.as_str() {
+                json_map.insert(key_str.to_string(), value.clone());
+            }
+        }
     }
-    pub async fn send_group_msg_api(&self) -> Result<String, reqwest::Error> {
-        // 构建 API 路径
-        let api_path = "send_group_msg";
-        let json_data = r#"
-        {
-            "user_id": 2977926714,
-            "message": "Bot启动"
-        }"#;
-        self.send_post_request(api_path, json_data).await
-    }
+    json!(json_map)
 }

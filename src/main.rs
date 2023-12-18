@@ -16,7 +16,7 @@ async fn main() {
     
 
 
-    match request.send_private_msg_api().await{
+    match request.send_private_msg_api(&2977926714u32,"hello").await{
         Ok(text) => {
             println!("post 返回{}", text);
         }
