@@ -1,7 +1,6 @@
 use serde_json::Value;
 
-use crate::postrequest;
-pub fn process_notice_event(json: &Value) {
+pub async fn process_notice_event(json: &Value, request: &crate::postrequest::Request) {
     // 处理 notice 类型的逻辑
     // 提取 notice_type 值
     if let Some(notice_type) = json["notice_type"].as_str() {
@@ -98,12 +97,20 @@ fn group_upload(json: &Value) {
     );
 }
 
-
 fn private_upload(json: &Value) {
-    if let (Some(user_id), Some(sender), Some(private_file)) =
-        (json["user_id"].as_i64(), json["sender"].as_i64(), json["private_file"].as_object())
-    {
-        if let (Some(file_id), Some(file_name), Some(file_size), Some(file_url), Some(sub_id), Some(expire)) = (
+    if let (Some(user_id), Some(sender), Some(private_file)) = (
+        json["user_id"].as_i64(),
+        json["sender"].as_i64(),
+        json["private_file"].as_object(),
+    ) {
+        if let (
+            Some(file_id),
+            Some(file_name),
+            Some(file_size),
+            Some(file_url),
+            Some(sub_id),
+            Some(expire),
+        ) = (
             private_file["id"].as_str(),
             private_file["name"].as_str(),
             private_file["size"].as_i64(),

@@ -1,5 +1,6 @@
 use serde_json::Value;
-pub fn process_request_event(json: &Value) {
+
+pub async fn process_request_event(json: &Value, request: &crate::postrequest::Request) {
     if let Some(request_type) = json["request_type"].as_str() {
         match request_type {
             "friend" => process_friend_request(json),

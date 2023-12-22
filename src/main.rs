@@ -1,29 +1,32 @@
-mod bot;
-mod event;
-mod postrequest;
-
-use postrequest::Request;
-use bot::Bot;
+use q_bot::bot::Bot;
+use q_bot::event::process_message;
+use q_bot::postrequest::Request;
 use tokio::signal::ctrl_c;
 use tokio_tungstenite::tungstenite::Message;
-use event::process_json;
+
 #[tokio::main]
 async fn main() {
-    
     let server_url = "192.168.1.8";
     let request = Request::new(server_url, 5700).await;
-    let mut bot = Bot::new(server_url, 5800,).await;
-    
+    let mut bot = Bot::new(server_url, 5800).await;
 
+    // match request.send_private_msg_api(&2977926714, "hello").await {
+    //     Ok(text) => {
+    //         println!("post 返回{}", text);
+    //     }
+    //     Err(err) => {
+    //         eprintln!("Error sending HTTP request: {:?}", err);
+    //     }
+    // }
 
-    match request.send_private_msg_api(&2977926714u32,"hello").await{
-        Ok(text) => {
-            println!("post 返回{}", text);
-        }
-        Err(err) => {
-            eprintln!("Error sending HTTP request: {:?}", err);
-        }
-    }
+    // match request.send_group_msg_api(&758145931, "hello").await {
+    //     Ok(text) => {
+    //         println!("post 返回{}", text);
+    //     }
+    //     Err(err) => {
+    //         eprintln!("Error sending HTTP request: {:?}", err);
+    //     }
+    // }
 
     let mut exit_flag = false;
 
@@ -40,7 +43,7 @@ async fn main() {
                     Some(Ok(message)) => {
                         if let Message::Text(text) = message {
                             let json = text;
-                            process_json(&json);
+                            process_message(&json,&&request).await;
                         }
                     }
                     Some(Err(err)) => {
@@ -51,7 +54,7 @@ async fn main() {
                 }
             }
         } => {},
-        
+
     };
 
     if exit_flag {
