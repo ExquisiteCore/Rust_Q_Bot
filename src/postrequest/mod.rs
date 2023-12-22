@@ -9,7 +9,7 @@ pub struct Request {
 // 请求类方法
 impl Request {
     // 发送POST请求
-    async fn send_post_request(
+    pub async fn send_post_request(
         &self,
         api: &str,       // API路径
         json_data: &str, // JSON格式的数据
@@ -96,9 +96,10 @@ impl Request {
             .await
     }
 }
+
 // 合成JSON数据
 fn synthesis_json(args: &[(&str, Value)]) -> Value {
-    let mut json_map = Map::new();
+    let mut json_map: Map<String, Value> = Map::new();
 
     for (key, value) in args {
         json_map.insert(key.to_string(), value.clone());

@@ -1,9 +1,29 @@
 {
-    "nickname": "昵称",
-    "company": "公司",
-    "email": "邮箱",
-    "college": "大学",
-    "personal_note": "个人备注",
-    "age": 18,
-    "birthday": "生日"
+    "font": 0,
+    "message": [
+        {
+            "data": {
+                "text": "你好"
+            },
+            "type": "text"
+        }
+    ],
+    "message_id": 675548933,
+    "message_type": "private",
+    "peer_id": 3389583001,
+    "post_type": "message",
+    "raw_message": "你好",
+    "self_id": 3389583001,
+    "sender": {
+        "card": "",
+        "level": "",
+        "nickname": "ExquisiteCore",
+        "role": "member",
+        "title": "",
+        "user_id": 2977926714
+    },
+    "sub_type": "friend",
+    "target_id": 2977926714,
+    "time": 1703249497,
+    "user_id": 2977926714
 }

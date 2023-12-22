@@ -10,24 +10,6 @@ async fn main() {
     let request = Request::new(server_url, 5700).await;
     let mut bot = Bot::new(server_url, 5800).await;
 
-    // match request.send_private_msg_api(&2977926714, "hello").await {
-    //     Ok(text) => {
-    //         println!("post 返回{}", text);
-    //     }
-    //     Err(err) => {
-    //         eprintln!("Error sending HTTP request: {:?}", err);
-    //     }
-    // }
-
-    // match request.send_group_msg_api(&758145931, "hello").await {
-    //     Ok(text) => {
-    //         println!("post 返回{}", text);
-    //     }
-    //     Err(err) => {
-    //         eprintln!("Error sending HTTP request: {:?}", err);
-    //     }
-    // }
-
     let mut exit_flag = false;
 
     // tokio::select! 允许我们等待多个异步任务
