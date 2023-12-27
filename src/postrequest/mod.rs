@@ -19,6 +19,7 @@ impl Request {
             .client
             .post(format!("{}{}", self.http_server_url, api))
             .header("Content-Type", "application/json")
+            .header("authorization", "123")
             .body(json_data.to_owned())
             .send()
             .await

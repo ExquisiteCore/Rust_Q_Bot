@@ -12,6 +12,7 @@ async fn main() {
 
     let mut exit_flag = false;
 
+    println!("Bot is running...");
     // tokio::select! 允许我们等待多个异步任务
     tokio::select! {
         _ = ctrl_c() => {

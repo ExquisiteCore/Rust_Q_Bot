@@ -1,9 +1,10 @@
-use std::time::Duration;
-
 use futures_util::StreamExt;
-use tokio::{net::TcpStream, time::sleep};
+use rand::Rng;
+use std::time::Duration;
+use tokio::net::TcpStream;
+use tokio::time::sleep;
 use tokio_tungstenite::tungstenite::protocol::Message;
-use tokio_tungstenite::WebSocketStream;
+use tokio_tungstenite::{client_async, WebSocketStream};
 use url::Url;
 // 连接 WebSocket
 pub async fn connect(url: &str) -> WebSocketStream<TcpStream> {
@@ -22,16 +23,35 @@ pub async fn connect(url: &str) -> WebSocketStream<TcpStream> {
     let host_with_port = format!("{}:{}", host, port);
 
     // 使用 TcpStream::connect 时直接传入解析得到的地址
-    let tcp_stream = TcpStream::connect(host_with_port)
+    let tcp_stream = TcpStream::connect(&host_with_port)
         .await
         .expect("Failed to connect to server");
 
+    // 生成随机的 "sec-websocket-key"
+    let sec_websocket_key: String = rand::thread_rng()
+        .sample_iter(&rand::distributions::Alphanumeric)
+        .take(16)
+        .map(|byte| byte as char) // 将 u8 转换为 char
+        .collect();
+    // 创建 WebSocket 握手请求
+    let request = tokio_tungstenite::tungstenite::handshake::client::Request::builder()
+        .uri(url)
+        .header("Host", &host_with_port)
+        .header("access_token", "123")
+        .header("sec-websocket-key", &sec_websocket_key)
+        .header("Sec-WebSocket-Version", "13")
+        .header("Connection", "Upgrade")
+        .header("Upgrade", "websocket")
+        .body(());
+
     // 使用解析得到的地址和 TcpStream 建立 WebSocket 连接
-    tokio_tungstenite::client_async(server_url, tcp_stream)
+    let ws_stream = client_async(request.unwrap(), tcp_stream)
         .await
-        .expect("Failed to establish WebSocket connection")
-        .0
+        .expect("Failed to establish WebSocket connection");
+
+    ws_stream.0
 }
+
 pub struct Bot {
     ws_server_url: String,
     ws_stream: WebSocketStream<TcpStream>,
